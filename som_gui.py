@@ -57,7 +57,7 @@ class GuiSom():
             #print("vector[",i,"] = (", vector[i], ",",vector[i+1],")")
             px = int(round(largeur * vector[i]))
             py = int(round(largeur * vector[i+1]))
-            cv2.circle(neurframe, (px, py), 1, 100, -1)
+            cv2.circle(neurframe,(px, py), 1, 100, -1)
             ## if (i>24 and i<36) or i < 14:# or i >20:
             ##     cv2.putText(neurframe, "{}".format(int(i/2)), (px, py), cv2.FONT_HERSHEY_SIMPLEX, .5,
             ##         color, 1)

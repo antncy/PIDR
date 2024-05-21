@@ -14,7 +14,8 @@ class landmarks_mp:
               'nose_tip': [0, 255, 255],
               'top_lip': [0, 0, 128],
               'bottom_lip': [0, 0, 128],
-              'chin': [255, 0, 0]}
+              'chin': [255, 0, 0],
+              'body': [0,0,0]}
 
 
     def __init__(self, salient="1111", reduct=False):
@@ -28,6 +29,7 @@ class landmarks_mp:
         self.detector = mp.solutions.face_detection.FaceDetection(min_detection_confidence=0.5)
         mp_face_mesh = mp.solutions.face_mesh
         self.face_mesh = mp_face_mesh.FaceMesh(static_image_mode=False, max_num_faces=2, min_detection_confidence=0.5)
+        self.pose = mp.solutions.pose.Pose(static_image_mode=False, min_detection_confidence=0.5)
         self.define_vector(salient)
         self._ready = False
 
@@ -46,6 +48,8 @@ class landmarks_mp:
 
         haut,large = img.shape[0],img.shape[1]
         results = self.detector.process(img)
+        results_body = self.pose.process(img)
+        list_body = results_body.pose_landmarks.landmark
         # on sort si aucun visage DETECTE
         if not results.detections:
 
@@ -88,13 +92,17 @@ class landmarks_mp:
                 "top_lip": cat(( [face_landmarks.landmark[291]], [face_landmarks.landmark[409]], [face_landmarks.landmark[270]],[face_landmarks.landmark[269]],[face_landmarks.landmark[267]], [face_landmarks.landmark[0]], [face_landmarks.landmark[37]], [face_landmarks.landmark[39]], [face_landmarks.landmark[40]],[face_landmarks.landmark[185]], [face_landmarks.landmark[61]])),
                 "bottom_lip": cat(([face_landmarks.landmark[61]], [face_landmarks.landmark[146]],[face_landmarks.landmark[91]], [face_landmarks.landmark[181]], [face_landmarks.landmark[84]],[face_landmarks.landmark[17]],[face_landmarks.landmark[314]], [face_landmarks.landmark[405]], [face_landmarks.landmark[321]], [face_landmarks.landmark[375]], [face_landmarks.landmark[291]])),
                 "facepos": liste,
+
             }
+
+        def point_dict_body():
+            return {"body": list_body[11:17],}
 
         self._ready = True  # boolean si visage existe
         self._faces = rects  # Tous les visages détectés
         self._face = point_dict(large,haut)  # dictionnaire des face_landmarks.landmark du visage le plus grand
-        # print("face : ", self._face)
-        #self._rect = rects  # Contour du visage le plus grand
+        # self._body = point_dict_body()
+
         self.extract_vector(large,haut)
 
     def define_vector(self, salient):
@@ -128,7 +136,7 @@ class landmarks_mp:
 
 
         self._interest = interest
-        self._sizeData = nbFeatures
+        self._sizeData = nbFeatures #+ 12
         self._coefs = np.array(coefs)
         print("\t profils : ", self._interest)
         print("\t nombre de face_landmarks.landmark : ", self.sizeData)
@@ -156,8 +164,8 @@ class landmarks_mp:
 
                         px = (coord.x * large - refx) / largx
                         py = (coord.y * haut - refy) / largy
-                        result = np.append(result, px)
-                        result = np.append(result, py)
+                        result.append(px)
+                        result.append(py)
                 continue
 
             if k in self._interest:
@@ -167,9 +175,14 @@ class landmarks_mp:
                     py = (coord.y * haut - refy) / largy
                     result.append(px)
                     result.append(py)
-        # print("len(result) : ", len(result))
-        # print()
-        # print()
+
+        # for k, pt in self._body.items():
+        #
+        #     for coord in pt:
+        #         px = (coord.x * large - refx) / largx
+        #         py = (coord.y * haut - refy) / largy
+        #         result.append(px)
+        #         result.append(py)
         self._current = np.array(result)  # face_landmarks.landmark d'intérêts
 
 
