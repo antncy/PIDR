@@ -20,7 +20,7 @@ import trace_som as ts
 from caracteristique.caracteristique import caracteristique
 #from clasifieur.network import DSOM_MODEL
 from draw.drawer import drawer
-from landmark.landmarks_mp import landmarks_mp as landmarks
+from landmark.landmarks_corps import landmarks_corps as landmarks
 
 import sys
 from PyQt5.Qt import *

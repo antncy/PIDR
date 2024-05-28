@@ -52,7 +52,6 @@ class landmarks_mp:
         list_body = results_body.pose_landmarks.landmark
         # on sort si aucun visage DETECTE
         if not results.detections:
-
             self._ready = False
             self._faces = None
             self._face = None
